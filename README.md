@@ -47,6 +47,10 @@ Upload a video, select a frame to continue the video from, and generate an exten
 
 ![extendvid.gif](extendvid.gif)
 
+Also, it's not just about extending from the end, you can use the slider interface to select precisely which point to continue the generation from.
+
+![frameselect.gif](frameselect.gif)
+
 ## 5. Seamless Workflow
 
 Once you generate a video, you can send it to:
@@ -57,6 +61,8 @@ Once you generate a video, you can send it to:
 tabs to add more editing, for example transforming the generated video, or taking the generated video and extending it to make it longer.
 
 ![btns.png](btns.png)
+
+
 
 # Install
 
