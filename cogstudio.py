@@ -556,7 +556,7 @@ with gr.Blocks(css=css) as demo:
                         video_to_extend = gr.Video(label="Video to extend")
                         with gr.Column():
                             extend_frame = gr.Image(label="Extrend from the last frame", visible=False)
-                            extend_slider = gr.Slider(label="Select start frame", visible=False)
+                            extend_slider = gr.Slider(label="Select start frame", step=0.01, visible=False)
                     video4 = gr.Video(visible=False)
                     full_gpu4 = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False, visible=False)
                     strength4 = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength")
@@ -601,7 +601,7 @@ with gr.Blocks(css=css) as demo:
         ts = clip.duration - 0.01
         frame = clip.get_frame(ts)
         frame_array = Image.fromarray(frame)
-        return gr.update(value=frame_array, visible=True), gr.update(value=ts, step=0.01, minimum=0.0, maximum = ts, visible=True)
+        return gr.update(value=frame_array, visible=True), gr.update(value=ts, minimum=0.0, maximum = ts, visible=True)
 
     def select_frame_ts(
         video_to_extend,
