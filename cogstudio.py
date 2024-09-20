@@ -554,7 +554,9 @@ with gr.Blocks(css=css) as demo:
                 with gr.Column():
                     with gr.Row():
                         video_to_extend = gr.Video(label="Video to extend")
-                        extend_frame = gr.Image(label="Extrend from the last frame", visible=False)
+                        gr.Column():
+                            extend_frame = gr.Image(label="Extrend from the last frame", visible=False)
+                            extend_slider = gr.Slider(label="Select frame", visible=False)
                     video4 = gr.Video(visible=False)
                     full_gpu4 = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False, visible=False)
                     strength4 = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength")
@@ -591,23 +593,42 @@ with gr.Blocks(css=css) as demo:
                         send_to_vid2vid_button4 = gr.Button("Send to video-to-video", visible=False)
                         send_to_extendvid_button4 = gr.Button("Send to extend-video", visible=False)
 
-    def last_frame(
+    def select_frame(
         video_to_extend,
     ):
-        # wait till the file is fully uploaded
-        prev_size = -1
-        while True:
-            size = os.path.getsize(video_to_extend)
-            if size == prev_size:
-                break
-            prev_size = size
-            time.sleep(0.5)
+#        # wait till the file is fully uploaded
+#        prev_size = -1
+#        while True:
+#            size = os.path.getsize(video_to_extend)
+#            if size == prev_size:
+#                break
+#            prev_size = size
+#            time.sleep(0.5)
 
         clip = mp.VideoFileClip(video_to_extend)
         print(f"clip duration = {clip.duration}")
-        last_frame = clip.get_frame(clip.duration-0.01)
-        frame = Image.fromarray(last_frame)
-        return gr.update(value=frame, visible=True)
+        ts = clip.duration - 0.01
+        frame = clip.get_frame(ts)
+        frame_array = Image.fromarray(frame)
+        return gr.update(value=frame_array, visible=True), gr.update(value=ts, minimum=0, maximum = ts, visible=True)
+
+    def select_frame_ts(
+        video_to_extend,
+        ts
+    ):
+#        # wait till the file is fully uploaded
+#        prev_size = -1
+#        while True:
+#            size = os.path.getsize(video_to_extend)
+#            if size == prev_size:
+#                break
+#            prev_size = size
+#            time.sleep(0.5)
+
+        clip = mp.VideoFileClip(video_to_extend)
+        frame = clip.get_frame(ts)
+        frame_array = Image.fromarray(frame)
+        return gr.update(value=frame_array, visible=True)
 
     def extend(
         prompt,
@@ -748,8 +769,13 @@ with gr.Blocks(css=css) as demo:
         outputs=[video_output4, download_video_button4, download_gif_button4, seed_text4, send_to_vid2vid_button4, send_to_extendvid_button4],
     )
     video_to_extend.change(
-        last_frame,
+        select_frame,
         inputs=[video_to_extend],
+        outputs=[extend_frame, extend_slider]
+    )
+    extend_slider.change(
+        select_frame_ts,
+        inputs=[video_to_extend, extend_slider],
         outputs=[extend_frame]
     )
 
