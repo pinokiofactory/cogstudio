@@ -2,6 +2,8 @@
 
 [NVIDIA Only] Advanced Web UI for CogVideo: https://github.com/THUDM/CogVideo
 
+![img2vid.gif](img2vid.gif)
+
 An advanced gradio web ui for generating and editing videos with CogVideo. Supports:
 
 1. **Text-to-video:** Enter prompt to generate videos
@@ -16,6 +18,45 @@ Cogstudio is a single file gradio application [cogstudio.py](cogstudio.py) that 
 
 Because it's minimal and blends into the cogvideo repo (instead of existing as a fork), it should take advantage of all the future updates of CogVideo while using the advanced UI.
 
+
+# Features
+
+## 1. Text to Video
+
+Enter prompt to generate videos
+
+![txt2vid.png](txt2vid.png)
+
+## 2. Video to Video
+
+Upload a video and enter a prompt to transform the video into another video.
+
+![vid2vid.gif](vid2vid.gif)
+
+## 3. Image to Video
+
+Upload a start image and a prompt, and generate a video from the image
+
+![img2vid.gif](img2vid.gif)
+
+## 4. Extend Video
+
+Upload a video, select a frame to continue the video from, and generate an extended video.
+
+> You can keep extending the generated video to infinity and generate a very long video this way.
+
+![extendvid.gif](extendvid.gif)
+
+## 5. Seamless Workflow
+
+Once you generate a video, you can send it to:
+
+1. video to video
+2. extend video
+
+tabs to add more editing, for example transforming the generated video, or taking the generated video and extending it to make it longer.
+
+![btns.png](btns.png)
 
 # Install
 
