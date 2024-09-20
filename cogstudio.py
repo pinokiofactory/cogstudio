@@ -554,7 +554,7 @@ with gr.Blocks(css=css) as demo:
                 with gr.Column():
                     with gr.Row():
                         video_to_extend = gr.Video(label="Video to extend")
-                        gr.Column():
+                        with gr.Column():
                             extend_frame = gr.Image(label="Extrend from the last frame", visible=False)
                             extend_slider = gr.Slider(label="Select frame", visible=False)
                     video4 = gr.Video(visible=False)

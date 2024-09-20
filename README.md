@@ -61,6 +61,12 @@ Install the CogVideo gradio dependencies into the venv
 pip install -r requirements.txt
 ```
 
+Install PyTorch for CUDA:
+
+```
+pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --index-url https://download.pytorch.org/whl/cu121
+```
+
 One more thing you need to do is use the latest version of moviepy:
 
 ```
