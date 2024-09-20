@@ -1,8 +1,8 @@
 const path = require('path')
 module.exports = {
   version: "2.1",
-  title: "cogvideo",
-  description: "[NVIDIA ONLY] Generate videos with less than 10GB VRAM https://github.com/THUDM/CogVideo",
+  title: "CogStudio",
+  description: "[NVIDIA ONLY] Advanced Web UI for CogVideo (text to video, image to video, video to video, extend video, etc) -- Generate videos with less than 10GB VRAM",
   icon: "icon.png",
   menu: async (kernel, info) => {
     let installed = info.exists("app/env")

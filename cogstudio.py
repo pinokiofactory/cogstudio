@@ -398,7 +398,6 @@ with gr.Blocks(css=css) as demo:
             with gr.Row():
                 with gr.Column():
                     prompt = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
-                    full_gpu = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False)
                     image = gr.Image(visible=False)
                     video = gr.Video(visible=False)
 
@@ -423,6 +422,7 @@ with gr.Blocks(css=css) as demo:
                     with gr.Row():
                         enable_scale = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
                         enable_rife = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+                    full_gpu = gr.Checkbox(label="Don't use CPU offload", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False)
                     generate_button = gr.Button("🎬 Generate Video")
 
                 with gr.Column():
