@@ -666,6 +666,7 @@ with gr.Blocks(css=css) as demo:
         # stitch video_to_extend with the generated video
         print(f"stitch {video_to_extend} {video_path}")
         video1 = mp.VideoFileClip(video_to_extend)
+        video1 = video1.without_audio()
         video2 = mp.VideoFileClip(video_path)
 
         extended_video = mp.concatenate_videoclips([video1, video2])
