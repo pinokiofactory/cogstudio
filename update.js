@@ -10,5 +10,11 @@ module.exports = {
       message: "git pull",
       path: "app"
     }
+  }, {
+    method: "fs.copy",
+    params: {
+      src: "cogstudio.py",
+      dest: "app/inference/gradio_composite_demo/cogstudio.py"
+    }
   }]
 }
