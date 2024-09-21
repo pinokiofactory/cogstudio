@@ -287,7 +287,7 @@ def resize_image(img, target_size):
     new_width = int(new_height * img_ratio)
    
     # Resize the image
-    resized_img = img.resize((new_width, new_height), Image.ANTIALIAS)
+    resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
    
     # Create a black background with the target size
     background = Image.new("RGB", target_size, (0, 0, 0))
@@ -370,13 +370,30 @@ def delete_old_files():
                         os.remove(file_path)
         time.sleep(600)
 
+def refresh_generated_videos():
+    time.sleep(2)
+    html = generated_videos()
+    return html
+def generated_videos():
+    try:
+        files = os.listdir("output")
+        vids = [os.path.join("output", item) for item in files if item.endswith(".mp4")]
+        vids.sort(key=lambda file: os.path.getctime(file), reverse=True)
+        vids = vids[:50]
+        vidhtml = ""
+        for vid in vids:
+            vidhtml = vidhtml + f"<video controls><source src='/file={vid}' /></video>"
+        return vidhtml
+    except Exception as e:
+        return ""
 
 #threading.Thread(target=delete_old_files, daemon=True).start()
 css="""
 .info{ padding: 15px; font-weight: bold; background: rgba(0, 0, 0, 0.04); }
+.btn { background: royalblue; color: white; }
 """
 
-with gr.Blocks(css=css) as demo:
+with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
 #    gr.Markdown("""
 #           <div style="text-align: center; font-size: 32px; font-weight: bold; margin-bottom: 20px;">
 #               CogVideoX-2B Huggingface Space🤗
@@ -392,206 +409,229 @@ with gr.Blocks(css=css) as demo:
 #            Users should strictly adhere to local laws and ethics.
 #            </div>
 #           """)
-    with gr.Tabs(selected=0) as tabs:
-        with gr.TabItem("text-to-video", id=0):
-            gr.HTML("<div class='info'>Generate a video from a prompt</div>")
-            with gr.Row():
-                with gr.Column():
-                    prompt = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
-                    image = gr.Image(visible=False)
-                    video = gr.Video(visible=False)
-
-                    strength = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength", visible=False)
+    with gr.Row():
+        with gr.Column(scale=7):
+            with gr.Tabs(selected=0) as tabs:
+                with gr.TabItem("text-to-video", id=0):
+                    gr.HTML("<div class='info'>Generate a video from a prompt</div>")
                     with gr.Row():
-                        gr.Markdown(
-                            "✨ To enhance the prompt, either set the OPENAI_API_KEY variable from the Configure menu (if you have an OpenAI API key), or just use chatgpt to enhance the prompt manually (Recommended)",
-                        )
-                        enhance_button = gr.Button("✨ Enhance Prompt(Optional)")
-
-                    with gr.Row():
-                        model_choice = gr.Dropdown(["THUDM/CogVideoX-2b", "THUDM/CogVideoX-5b"], value="THUDM/CogVideoX-2b", label="Model")
-                    with gr.Row():
-                        num_inference_steps = gr.Number(label="Inference Steps", value=50)
-                        guidance_scale = gr.Number(label="Guidance Scale", value=6.0)
-                    with gr.Row():
-                        dtype_choice = gr.Radio(["bfloat16", "float16"], label="dtype (older machines may not support bfloat16. try float16 if bfloat16 doesn't work)", value="bfloat16")
-                    with gr.Row():
-                        seed_param = gr.Number(
-                            label="Inference Seed (Enter a positive number, -1 for random)", value=-1
-                        )
-                    with gr.Row():
-                        enable_scale = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                        enable_rife = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
-                    full_gpu = gr.Checkbox(label="Don't use CPU offload", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False)
-                    generate_button = gr.Button("🎬 Generate Video")
-
-                with gr.Column():
-                    video_output = gr.Video(label="CogVideoX Generate Video", width=720, height=480)
-                    with gr.Row():
-                        download_video_button = gr.File(label="📥 Download Video", visible=False)
-                        download_gif_button = gr.File(label="📥 Download GIF", visible=False)
-                        seed_text = gr.Number(label="Seed used for generation", visible=False)
-                        send_to_vid2vid_button = gr.Button("Send to video-to-video", visible=False)
-                        send_to_extendvid_button = gr.Button("Send to extend-video", visible=False)
-            gr.Markdown("""
-            <table border="0" style="width: 100%; text-align: left; margin-top: 20px;">
-                <div style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px;">
-                    Demo Videos with 50 Inference Steps and 6.0 Guidance Scale.
-                </div>
-                <tr>
-                    <td style="width: 25%; vertical-align: top; font-size: 0.8em;">
-                        <p>A detailed wooden toy ship with intricately carved masts and sails is seen gliding smoothly over a plush, blue carpet that mimics the waves of the sea. The ship's hull is painted a rich brown, with tiny windows. The carpet, soft and textured, provides a perfect backdrop, resembling an oceanic expanse. Surrounding the ship are various other toys and children's items, hinting at a playful environment. The scene captures the innocence and imagination of childhood, with the toy ship's journey symbolizing endless adventures in a whimsical, indoor setting.</p>
-                    </td>
-                    <td style="width: 25%; vertical-align: top;">
-                        <video src="https://github.com/user-attachments/assets/ea3af39a-3160-4999-90ec-2f7863c5b0e9" width="100%" controls autoplay></video>
-                    </td>
-                    <td style="width: 25%; vertical-align: top; font-size: 0.8em;">
-                        <p>The camera follows behind a white vintage SUV with a black roof rack as it speeds up a steep dirt road surrounded by pine trees on a steep mountain slope, dust kicks up from its tires, the sunlight shines on the SUV as it speeds along the dirt road, casting a warm glow over the scene. The dirt road curves gently into the distance, with no other cars or vehicles in sight. The trees on either side of the road are redwoods, with patches of greenery scattered throughout. The car is seen from the rear following the curve with ease, making it seem as if it is on a rugged drive through the rugged terrain. The dirt road itself is surrounded by steep hills and mountains, with a clear blue sky above with wispy clouds.</p>
-                    </td>
-                    <td style="width: 25%; vertical-align: top;">
-                        <video src="https://github.com/user-attachments/assets/9de41efd-d4d1-4095-aeda-246dd834e91d" width="100%" controls autoplay></video>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 25%; vertical-align: top; font-size: 0.8em;">
-                        <p>A street artist, clad in a worn-out denim jacket and a colorful bandana, stands before a vast concrete wall in the heart, holding a can of spray paint, spray-painting a colorful bird on a mottled wall.</p>
-                    </td>
-                    <td style="width: 25%; vertical-align: top;">
-                        <video src="https://github.com/user-attachments/assets/941d6661-6a8d-4a1b-b912-59606f0b2841" width="100%" controls autoplay></video>
-                    </td>
-                    <td style="width: 25%; vertical-align: top; font-size: 0.8em;">
-                        <p>In the haunting backdrop of a war-torn city, where ruins and crumbled walls tell a story of devastation, a poignant close-up frames a young girl. Her face is smudged with ash, a silent testament to the chaos around her. Her eyes glistening with a mix of sorrow and resilience, capturing the raw emotion of a world that has lost its innocence to the ravages of conflict.</p>
-                    </td>
-                    <td style="width: 25%; vertical-align: top;">
-                        <video src="https://github.com/user-attachments/assets/938529c4-91ae-4f60-b96b-3c3947fa63cb" width="100%" controls autoplay></video>
-                    </td>
-                </tr>
-            </table>
-            """)
-        with gr.TabItem("video-to-video", id=1):
-            gr.HTML("<div class='info'>Transform a video with a prompt</div>")
-            with gr.Row():
-                with gr.Column():
-                    image2 = gr.Image(visible=False)
-                    video2 = gr.Video(label="Driving Video")
-                    full_gpu2 = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False, visible=False)
-                    strength2 = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength")
-                    prompt2 = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
-
-                    with gr.Row():
-                        gr.Markdown(
-                            "✨ To enhance the prompt, either set the OPENAI_API_KEY variable from the Configure menu (if you have an OpenAI API key), or just use chatgpt to enhance the prompt manually (Recommended)",
-                        )
-                        enhance_button2 = gr.Button("✨ Enhance Prompt(Optional)")
-
-                    with gr.Row():
-                        model_choice2 = gr.Dropdown(["THUDM/CogVideoX-2b", "THUDM/CogVideoX-5b"], value="THUDM/CogVideoX-2b", label="Model")
-                    with gr.Row():
-                        num_inference_steps2 = gr.Number(label="Inference Steps", value=50)
-                        guidance_scale2 = gr.Number(label="Guidance Scale", value=6.0)
-                    with gr.Row():
-                        dtype_choice2 = gr.Radio(["bfloat16", "float16"], label="dtype (older machines may not support bfloat16. try float16 if bfloat16 doesn't work)", value="bfloat16")
-                    with gr.Row():
-                        seed_param2 = gr.Number(
-                            label="Inference Seed (Enter a positive number, -1 for random)", value=-1
-                        )
-                    with gr.Row():
-                        enable_scale2 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                        enable_rife2 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
-                    generate_button2 = gr.Button("🎬 Generate Video")
-
-                with gr.Column():
-                    video_output2 = gr.Video(label="CogVideoX Generate Video", width=720, height=480)
-                    with gr.Row():
-                        download_video_button2 = gr.File(label="📥 Download Video", visible=False)
-                        download_gif_button2 = gr.File(label="📥 Download GIF", visible=False)
-                        seed_text2 = gr.Number(label="Seed used for generation", visible=False)
-                        send_to_vid2vid_button2 = gr.Button("Send to video-to-video", visible=False)
-                        send_to_extendvid_button2 = gr.Button("Send to extend-video", visible=False)
-        with gr.TabItem("image-to-video", id=2):
-            gr.HTML("<div class='info'>Generate 6 second videos starting from an image</div>")
-            with gr.Row():
-                with gr.Column():
-                    image3 = gr.Image(label="Driving Image")
-                    video3 = gr.Video(visible=False)
-                    full_gpu3 = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False, visible=False)
-                    strength3 = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength")
-                    prompt3 = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
-
-                    with gr.Row():
-                        gr.Markdown(
-                            "✨ To enhance the prompt, either set the OPENAI_API_KEY variable from the Configure menu (if you have an OpenAI API key), or just use chatgpt to enhance the prompt manually (Recommended)",
-                        )
-                        enhance_button3 = gr.Button("✨ Enhance Prompt(Optional)")
-
-                    with gr.Row():
-                        model_choice3 = gr.Dropdown(["THUDM/CogVideoX-2b", "THUDM/CogVideoX-5b"], value="THUDM/CogVideoX-5b", label="Model", visible=False)
-                    with gr.Row():
-                        num_inference_steps3 = gr.Number(label="Inference Steps", value=50)
-                        guidance_scale3 = gr.Number(label="Guidance Scale", value=6.0)
-                    with gr.Row():
-                        dtype_choice3 = gr.Radio(["bfloat16", "float16"], label="dtype (older machines may not support bfloat16. try float16 if bfloat16 doesn't work)", value="bfloat16")
-                    with gr.Row():
-                        seed_param3 = gr.Number(
-                            label="Inference Seed (Enter a positive number, -1 for random)", value=-1
-                        )
-                    with gr.Row():
-                        enable_scale3 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                        enable_rife3 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
-                    generate_button3 = gr.Button("🎬 Generate Video")
-
-                with gr.Column():
-                    video_output3 = gr.Video(label="CogVideoX Generate Video", width=720, height=480)
-                    with gr.Row():
-                        download_video_button3 = gr.File(label="📥 Download Video", visible=False)
-                        download_gif_button3 = gr.File(label="📥 Download GIF", visible=False)
-                        seed_text3 = gr.Number(label="Seed used for generation", visible=False)
-                        send_to_vid2vid_button3 = gr.Button("Send to video-to-video", visible=False)
-                        send_to_extendvid_button3 = gr.Button("Send to extend-video", visible=False)
-        with gr.TabItem("extend-video", id=3):
-            gr.HTML("<div class='info'>Take any video and extend 6 seconds</div>")
-            with gr.Row():
-                with gr.Column():
-                    with gr.Row():
-                        video_to_extend = gr.Video(label="Video to extend")
                         with gr.Column():
-                            extend_frame = gr.Image(label="Extrend from the last frame", visible=False)
-                            extend_slider = gr.Slider(label="Select start frame", step=0.01, visible=False)
-                    video4 = gr.Video(visible=False)
-                    full_gpu4 = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False, visible=False)
-                    strength4 = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength")
-                    prompt4 = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
+                            with gr.Row():
+                                generate_button = gr.Button("Generate Video", elem_id="gen1", elem_classes='btn')
+                                cancel_button = gr.Button("Cancel", visible=False)
+                                forever1 = gr.Checkbox(label="generate forever", value=False, elem_id='forever1')
+                            prompt = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
+                            image = gr.Image(visible=False)
+                            video = gr.Video(visible=False)
 
-                    with gr.Row():
-                        gr.Markdown(
-                            "✨ To enhance the prompt, either set the OPENAI_API_KEY variable from the Configure menu (if you have an OpenAI API key), or just use chatgpt to enhance the prompt manually (Recommended)",
-                        )
-                        enhance_button4 = gr.Button("✨ Enhance Prompt(Optional)")
+                            strength = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength", visible=False)
+                            with gr.Row():
+                                gr.Markdown(
+                                    "✨ To enhance the prompt, either set the OPENAI_API_KEY variable from the Configure menu (if you have an OpenAI API key), or just use chatgpt to enhance the prompt manually (Recommended)",
+                                )
+                                enhance_button = gr.Button("✨ Enhance Prompt(Optional)")
 
-                    with gr.Row():
-                        model_choice4 = gr.Dropdown(["THUDM/CogVideoX-2b", "THUDM/CogVideoX-5b"], value="THUDM/CogVideoX-5b", label="Model", visible=False)
-                    with gr.Row():
-                        num_inference_steps4 = gr.Number(label="Inference Steps", value=50)
-                        guidance_scale4 = gr.Number(label="Guidance Scale", value=6.0)
-                    with gr.Row():
-                        dtype_choice4 = gr.Radio(["bfloat16", "float16"], label="dtype (older machines may not support bfloat16. try float16 if bfloat16 doesn't work)", value="bfloat16")
-                    with gr.Row():
-                        seed_param4 = gr.Number(
-                            label="Inference Seed (Enter a positive number, -1 for random)", value=-1
-                        )
-                    with gr.Row():
-                        enable_scale4 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                        enable_rife4 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
-                    generate_button4 = gr.Button("🎬 Generate Video")
+                            with gr.Row():
+                                model_choice = gr.Dropdown(["THUDM/CogVideoX-2b", "THUDM/CogVideoX-5b"], value="THUDM/CogVideoX-2b", label="Model")
+                            with gr.Row():
+                                num_inference_steps = gr.Number(label="Inference Steps", value=50)
+                                guidance_scale = gr.Number(label="Guidance Scale", value=6.0)
+                            with gr.Row():
+                                dtype_choice = gr.Radio(["bfloat16", "float16"], label="dtype (older machines may not support bfloat16. try float16 if bfloat16 doesn't work)", value="bfloat16")
+                            with gr.Row():
+                                seed_param = gr.Number(
+                                    label="Inference Seed (Enter a positive number, -1 for random)", value=-1
+                                )
+                            with gr.Row():
+                                enable_scale = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
+                                enable_rife = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+                            full_gpu = gr.Checkbox(label="Don't use CPU offload", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False)
 
-                with gr.Column():
-                    video_output4 = gr.Video(label="CogVideoX Generate Video", width=720, height=480)
+                        with gr.Column():
+                            video_output = gr.Video(label="Generated", width=720, height=480, interactive=False)
+                            with gr.Row():
+                                download_video_button = gr.File(label="📥 Download Video", visible=False)
+                                download_gif_button = gr.File(label="📥 Download GIF", visible=False)
+                                seed_text = gr.Number(label="Seed used for generation", visible=False)
+                            with gr.Row():
+                                send_to_vid2vid_button = gr.Button("Send to video-to-video", visible=False)
+                                send_to_extendvid_button = gr.Button("Send to extend-video", visible=False)
+                    gr.Markdown("""
+                    <table border="0" style="width: 100%; text-align: left; margin-top: 20px;">
+                        <div style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px;">
+                            Demo Videos with 50 Inference Steps and 6.0 Guidance Scale.
+                        </div>
+                        <tr>
+                            <td style="width: 25%; vertical-align: top; font-size: 0.8em;">
+                                <p>A detailed wooden toy ship with intricately carved masts and sails is seen gliding smoothly over a plush, blue carpet that mimics the waves of the sea. The ship's hull is painted a rich brown, with tiny windows. The carpet, soft and textured, provides a perfect backdrop, resembling an oceanic expanse. Surrounding the ship are various other toys and children's items, hinting at a playful environment. The scene captures the innocence and imagination of childhood, with the toy ship's journey symbolizing endless adventures in a whimsical, indoor setting.</p>
+                            </td>
+                            <td style="width: 25%; vertical-align: top;">
+                                <video src="https://github.com/user-attachments/assets/ea3af39a-3160-4999-90ec-2f7863c5b0e9" width="100%" controls autoplay></video>
+                            </td>
+                            <td style="width: 25%; vertical-align: top; font-size: 0.8em;">
+                                <p>The camera follows behind a white vintage SUV with a black roof rack as it speeds up a steep dirt road surrounded by pine trees on a steep mountain slope, dust kicks up from its tires, the sunlight shines on the SUV as it speeds along the dirt road, casting a warm glow over the scene. The dirt road curves gently into the distance, with no other cars or vehicles in sight. The trees on either side of the road are redwoods, with patches of greenery scattered throughout. The car is seen from the rear following the curve with ease, making it seem as if it is on a rugged drive through the rugged terrain. The dirt road itself is surrounded by steep hills and mountains, with a clear blue sky above with wispy clouds.</p>
+                            </td>
+                            <td style="width: 25%; vertical-align: top;">
+                                <video src="https://github.com/user-attachments/assets/9de41efd-d4d1-4095-aeda-246dd834e91d" width="100%" controls autoplay></video>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 25%; vertical-align: top; font-size: 0.8em;">
+                                <p>A street artist, clad in a worn-out denim jacket and a colorful bandana, stands before a vast concrete wall in the heart, holding a can of spray paint, spray-painting a colorful bird on a mottled wall.</p>
+                            </td>
+                            <td style="width: 25%; vertical-align: top;">
+                                <video src="https://github.com/user-attachments/assets/941d6661-6a8d-4a1b-b912-59606f0b2841" width="100%" controls autoplay></video>
+                            </td>
+                            <td style="width: 25%; vertical-align: top; font-size: 0.8em;">
+                                <p>In the haunting backdrop of a war-torn city, where ruins and crumbled walls tell a story of devastation, a poignant close-up frames a young girl. Her face is smudged with ash, a silent testament to the chaos around her. Her eyes glistening with a mix of sorrow and resilience, capturing the raw emotion of a world that has lost its innocence to the ravages of conflict.</p>
+                            </td>
+                            <td style="width: 25%; vertical-align: top;">
+                                <video src="https://github.com/user-attachments/assets/938529c4-91ae-4f60-b96b-3c3947fa63cb" width="100%" controls autoplay></video>
+                            </td>
+                        </tr>
+                    </table>
+                    """)
+                with gr.TabItem("video-to-video", id=1):
+                    gr.HTML("<div class='info'>Transform a video with a prompt</div>")
                     with gr.Row():
-                        download_video_button4 = gr.File(label="📥 Download Video", visible=False)
-                        download_gif_button4 = gr.File(label="📥 Download GIF", visible=False)
-                        seed_text4 = gr.Number(label="Seed used for generation", visible=False)
-                        send_to_vid2vid_button4 = gr.Button("Send to video-to-video", visible=False)
-                        send_to_extendvid_button4 = gr.Button("Send to extend-video", visible=False)
+                        with gr.Column():
+                            with gr.Row():
+                                generate_button2 = gr.Button("Generate Video", elem_id="gen2", elem_classes='btn')
+                                cancel_button2 = gr.Button("Cancel", visible=False)
+                                forever2 = gr.Checkbox(label="generate forever", value=False, elem_id='forever2')
+                            image2 = gr.Image(visible=False)
+                            video2 = gr.Video(label="Driving Video")
+                            full_gpu2 = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False, visible=False)
+                            strength2 = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength")
+                            prompt2 = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
+
+                            with gr.Row():
+                                gr.Markdown(
+                                    "✨ To enhance the prompt, either set the OPENAI_API_KEY variable from the Configure menu (if you have an OpenAI API key), or just use chatgpt to enhance the prompt manually (Recommended)",
+                                )
+                                enhance_button2 = gr.Button("✨ Enhance Prompt(Optional)")
+
+                            with gr.Row():
+                                model_choice2 = gr.Dropdown(["THUDM/CogVideoX-2b", "THUDM/CogVideoX-5b"], value="THUDM/CogVideoX-2b", label="Model")
+                            with gr.Row():
+                                num_inference_steps2 = gr.Number(label="Inference Steps", value=50)
+                                guidance_scale2 = gr.Number(label="Guidance Scale", value=6.0)
+                            with gr.Row():
+                                dtype_choice2 = gr.Radio(["bfloat16", "float16"], label="dtype (older machines may not support bfloat16. try float16 if bfloat16 doesn't work)", value="bfloat16")
+                            with gr.Row():
+                                seed_param2 = gr.Number(
+                                    label="Inference Seed (Enter a positive number, -1 for random)", value=-1
+                                )
+                            with gr.Row():
+                                enable_scale2 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
+                                enable_rife2 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+
+                        with gr.Column():
+                            video_output2 = gr.Video(label="Generated", width=720, height=480, interactive=False)
+                            with gr.Row():
+                                download_video_button2 = gr.File(label="📥 Download Video", visible=False)
+                                download_gif_button2 = gr.File(label="📥 Download GIF", visible=False)
+                                seed_text2 = gr.Number(label="Seed used for generation", visible=False)
+                            with gr.Row():
+                                send_to_vid2vid_button2 = gr.Button("Send to video-to-video", visible=False)
+                                send_to_extendvid_button2 = gr.Button("Send to extend-video", visible=False)
+                with gr.TabItem("image-to-video", id=2):
+                    gr.HTML("<div class='info'>Generate 6 second videos starting from an image</div>")
+                    with gr.Row():
+                        with gr.Column():
+                            with gr.Row():
+                                generate_button3 = gr.Button("Generate Video", elem_id="gen3", elem_classes='btn')
+                                cancel_button3 = gr.Button("Cancel", visible=False)
+                                forever3 = gr.Checkbox(label="generate forever", value=False, elem_id="forever3")
+                            image3 = gr.Image(label="Driving Image")
+                            video3 = gr.Video(visible=False)
+                            full_gpu3 = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False, visible=False)
+                            strength3 = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength")
+                            prompt3 = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
+
+                            with gr.Row():
+                                gr.Markdown(
+                                    "✨ To enhance the prompt, either set the OPENAI_API_KEY variable from the Configure menu (if you have an OpenAI API key), or just use chatgpt to enhance the prompt manually (Recommended)",
+                                )
+                                enhance_button3 = gr.Button("✨ Enhance Prompt(Optional)")
+
+                            with gr.Row():
+                                model_choice3 = gr.Dropdown(["THUDM/CogVideoX-2b", "THUDM/CogVideoX-5b"], value="THUDM/CogVideoX-5b", label="Model", visible=False)
+                            with gr.Row():
+                                num_inference_steps3 = gr.Number(label="Inference Steps", value=50)
+                                guidance_scale3 = gr.Number(label="Guidance Scale", value=6.0)
+                            with gr.Row():
+                                dtype_choice3 = gr.Radio(["bfloat16", "float16"], label="dtype (older machines may not support bfloat16. try float16 if bfloat16 doesn't work)", value="bfloat16")
+                            with gr.Row():
+                                seed_param3 = gr.Number(
+                                    label="Inference Seed (Enter a positive number, -1 for random)", value=-1
+                                )
+                            with gr.Row():
+                                enable_scale3 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
+                                enable_rife3 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+
+                        with gr.Column():
+                            video_output3 = gr.Video(label="Generated", width=720, height=480, interactive=False)
+                            with gr.Row():
+                                download_video_button3 = gr.File(label="📥 Download Video", visible=False)
+                                download_gif_button3 = gr.File(label="📥 Download GIF", visible=False)
+                                seed_text3 = gr.Number(label="Seed used for generation", visible=False)
+                            with gr.Row():
+                                send_to_vid2vid_button3 = gr.Button("Send to video-to-video", visible=False)
+                                send_to_extendvid_button3 = gr.Button("Send to extend-video", visible=False)
+                with gr.TabItem("extend-video", id=3):
+                    gr.HTML("<div class='info'>Take any video and extend 6 seconds</div>")
+                    with gr.Row():
+                        with gr.Column():
+                            with gr.Row():
+                                generate_button4 = gr.Button("Generate Video", elem_id="gen4", elem_classes='btn')
+                                cancel_button4 = gr.Button("Cancel", visible=False)
+                                forever4 = gr.Checkbox(label="generate forever", value=False, elem_id="forever4")
+                            with gr.Row():
+                                video_to_extend = gr.Video(label="Video to extend")
+                                with gr.Column():
+                                    extend_frame = gr.Image(label="Extrend from the last frame", visible=False)
+                                    extend_slider = gr.Slider(label="Select start frame", step=0.01, visible=False)
+                            video4 = gr.Video(visible=False)
+                            full_gpu4 = gr.Checkbox(label="Use Full GPU", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False, visible=False)
+                            strength4 = gr.Number(value=0.8, minimum=0.1, maximum=1.0, step=0.01, label="Strength")
+                            prompt4 = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
+
+                            with gr.Row():
+                                gr.Markdown(
+                                    "✨ To enhance the prompt, either set the OPENAI_API_KEY variable from the Configure menu (if you have an OpenAI API key), or just use chatgpt to enhance the prompt manually (Recommended)",
+                                )
+                                enhance_button4 = gr.Button("✨ Enhance Prompt(Optional)")
+
+                            with gr.Row():
+                                model_choice4 = gr.Dropdown(["THUDM/CogVideoX-2b", "THUDM/CogVideoX-5b"], value="THUDM/CogVideoX-5b", label="Model", visible=False)
+                            with gr.Row():
+                                num_inference_steps4 = gr.Number(label="Inference Steps", value=50)
+                                guidance_scale4 = gr.Number(label="Guidance Scale", value=6.0)
+                            with gr.Row():
+                                dtype_choice4 = gr.Radio(["bfloat16", "float16"], label="dtype (older machines may not support bfloat16. try float16 if bfloat16 doesn't work)", value="bfloat16")
+                            with gr.Row():
+                                seed_param4 = gr.Number(
+                                    label="Inference Seed (Enter a positive number, -1 for random)", value=-1
+                                )
+                            with gr.Row():
+                                enable_scale4 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
+                                enable_rife4 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+
+                        with gr.Column():
+                            video_output4 = gr.Video(label="Generated", width=720, height=480, interactive=False)
+                            with gr.Row():
+                                download_video_button4 = gr.File(label="📥 Download Video", visible=False)
+                                download_gif_button4 = gr.File(label="📥 Download GIF", visible=False)
+                                seed_text4 = gr.Number(label="Seed used for generation", visible=False)
+                            with gr.Row():
+                                send_to_vid2vid_button4 = gr.Button("Send to video-to-video", visible=False)
+                                send_to_extendvid_button4 = gr.Button("Send to extend-video", visible=False)
+        #reel = gr.Column(generated_videos(), scale=1)
+        with gr.Column(scale=1):
+            reel = gr.HTML(generated_videos())
+            #generated_videos()
+        #    reel = generated_videos()
 
     def select_frame(
         video_to_extend,
@@ -663,8 +703,9 @@ with gr.Blocks(css=css) as demo:
         video_update = gr.update(visible=True, value=extended_video_path)
         gif_path = convert_to_gif(extended_video_path)
         gif_update = gr.update(visible=True, value=gif_path)
+        cancel_button_update = gr.update(visible=False)
 
-        return extended_video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update
+        return extended_video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update, cancel_button_update
 
     def generate(
         prompt,
@@ -719,8 +760,9 @@ with gr.Blocks(css=css) as demo:
         seed_update = gr.update(visible=True, value=seed)
         vid2vid_update = gr.update(visible=True)
         extendvid_update = gr.update(visible=True)
+        cancel_button_update = gr.update(visible=False)
 
-        return video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update
+        return video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update, cancel_button_update
 
     def enhance_prompt_func(prompt):
         return convert_prompt(prompt, retry_times=1)
@@ -733,27 +775,60 @@ with gr.Blocks(css=css) as demo:
         extendvid = gr.update(value=vid)
         tabs = gr.Tabs(selected=3)
         return [extendvid, tabs]
+    def forever_gen(button_selector, checkbox_selector):
+        return f"""function() {{
+    let checked = document.querySelector('{checkbox_selector} input[type=checkbox]')
+    console.log('checked', checked.checked)
+    if (checked.checked) {{
+        console.log('generate forever')
+        setTimeout(() => {{
+            let el = document.querySelector('{button_selector}');
+            console.log('el', el);
+            el.click();
+        }}, 1000)
+    }} else {{
+        console.log('finished')
+    }}
+}}"""
+    def show_cancel():
+        return gr.update(visible=True)
 
-    generate_button.click(
+
+    g1 = generate_button.click(
+        show_cancel, outputs=[cancel_button]
+    ).then(
         generate,
         inputs=[prompt, image, video, strength, num_inference_steps, guidance_scale, model_choice, dtype_choice, seed_param, enable_scale, enable_rife, full_gpu],
-        outputs=[video_output, download_video_button, download_gif_button, seed_text, send_to_vid2vid_button, send_to_extendvid_button],
+        outputs=[video_output, download_video_button, download_gif_button, seed_text, send_to_vid2vid_button, send_to_extendvid_button, cancel_button],
     )
-    generate_button2.click(
+    g2 = generate_button2.click(
+        show_cancel, outputs=[cancel_button2]
+    ).then(
         generate,
         inputs=[prompt2, image2, video2, strength2, num_inference_steps2, guidance_scale2, model_choice2, dtype_choice2, seed_param2, enable_scale2, enable_rife2, full_gpu2],
-        outputs=[video_output2, download_video_button2, download_gif_button2, seed_text2, send_to_vid2vid_button2, send_to_extendvid_button2],
+        outputs=[video_output2, download_video_button2, download_gif_button2, seed_text2, send_to_vid2vid_button2, send_to_extendvid_button2, cancel_button2],
     )
-    generate_button3.click(
+    g3 = generate_button3.click(
+        show_cancel, outputs=[cancel_button3]
+    ).then(
         generate,
         inputs=[prompt3, image3, video3, strength3, num_inference_steps3, guidance_scale3, model_choice3, dtype_choice3, seed_param3, enable_scale3, enable_rife3, full_gpu3],
-        outputs=[video_output3, download_video_button3, download_gif_button3, seed_text3, send_to_vid2vid_button3, send_to_extendvid_button3],
+        outputs=[video_output3, download_video_button3, download_gif_button3, seed_text3, send_to_vid2vid_button3, send_to_extendvid_button3, cancel_button3],
     )
-    generate_button4.click(
+    g4 = generate_button4.click(
+        show_cancel, outputs=[cancel_button4]
+    ).then(
         extend,
         inputs=[prompt4, video_to_extend, extend_slider, extend_frame, video4, strength4, num_inference_steps4, guidance_scale4, model_choice4, dtype_choice4, seed_param4, enable_scale4, enable_rife4, full_gpu4],
-        outputs=[video_output4, download_video_button4, download_gif_button4, seed_text4, send_to_vid2vid_button4, send_to_extendvid_button4],
+        outputs=[video_output4, download_video_button4, download_gif_button4, seed_text4, send_to_vid2vid_button4, send_to_extendvid_button4, cancel_button4],
     )
+    c1 = cancel_button.click(None, None, None, cancels=[g1])
+    c2 = cancel_button2.click(None, None, None, cancels=[g2])
+    c3 = cancel_button3.click(None, None, None, cancels=[g3])
+    c4 = cancel_button4.click(None, None, None, cancels=[g4])
+
+
+
     video_to_extend.change(
         select_frame,
         inputs=[video_to_extend],
@@ -779,6 +854,12 @@ with gr.Blocks(css=css) as demo:
     send_to_extendvid_button2.click(send_to_extendvid, inputs=[video_output2], outputs=[video_to_extend, tabs])
     send_to_extendvid_button3.click(send_to_extendvid, inputs=[video_output3], outputs=[video_to_extend, tabs])
     send_to_extendvid_button4.click(send_to_extendvid, inputs=[video_output4], outputs=[video_to_extend, tabs])
+
+    video_output.change(refresh_generated_videos, outputs=reel, js=forever_gen("#gen1", "#forever1"))
+    video_output2.change(refresh_generated_videos, outputs=reel, js=forever_gen("#gen2", "#forever2"))
+    video_output3.change(refresh_generated_videos, outputs=reel, js=forever_gen("#gen3", "#forever3"))
+    video_output4.change(refresh_generated_videos, outputs=reel, js=forever_gen("#gen4", "#forever4"))
+    demo.load(refresh_generated_videos, outputs=reel)
 
 if __name__ == "__main__":
     demo.launch()
