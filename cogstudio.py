@@ -418,7 +418,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                         with gr.Column():
                             with gr.Row():
                                 generate_button = gr.Button("Generate Video", elem_id="gen1", elem_classes='btn')
-                                cancel_button = gr.Button("Cancel", visible=False)
+                                #cancel_button = gr.Button("Cancel", visible=False)
                                 forever1 = gr.Checkbox(label="generate forever", value=False, elem_id='forever1')
                             prompt = gr.Textbox(label="Prompt (Less than 200 Words. The more detailed the better.)", placeholder="Enter your prompt here", lines=5)
                             image = gr.Image(visible=False)
@@ -444,7 +444,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                                 )
                             with gr.Row():
                                 enable_scale = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                                enable_rife = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+                                enable_rife = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False, visible=False)
                             full_gpu = gr.Checkbox(label="Don't use CPU offload", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False)
 
                         with gr.Column():
@@ -497,7 +497,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                         with gr.Column():
                             with gr.Row():
                                 generate_button2 = gr.Button("Generate Video", elem_id="gen2", elem_classes='btn')
-                                cancel_button2 = gr.Button("Cancel", visible=False)
+                                #cancel_button2 = gr.Button("Cancel", visible=False)
                                 forever2 = gr.Checkbox(label="generate forever", value=False, elem_id='forever2')
                             image2 = gr.Image(visible=False)
                             video2 = gr.Video(label="Driving Video")
@@ -524,7 +524,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                                 )
                             with gr.Row():
                                 enable_scale2 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                                enable_rife2 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+                                enable_rife2 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False, visible=False)
 
                         with gr.Column():
                             video_output2 = gr.Video(label="Generated", width=720, height=480, interactive=False)
@@ -541,7 +541,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                         with gr.Column():
                             with gr.Row():
                                 generate_button3 = gr.Button("Generate Video", elem_id="gen3", elem_classes='btn')
-                                cancel_button3 = gr.Button("Cancel", visible=False)
+                                #cancel_button3 = gr.Button("Cancel", visible=False)
                                 forever3 = gr.Checkbox(label="generate forever", value=False, elem_id="forever3")
                             image3 = gr.Image(label="Driving Image")
                             video3 = gr.Video(visible=False)
@@ -568,7 +568,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                                 )
                             with gr.Row():
                                 enable_scale3 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                                enable_rife3 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+                                enable_rife3 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False, visible=False)
 
                         with gr.Column():
                             video_output3 = gr.Video(label="Generated", width=720, height=480, interactive=False)
@@ -585,7 +585,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                         with gr.Column():
                             with gr.Row():
                                 generate_button4 = gr.Button("Generate Video", elem_id="gen4", elem_classes='btn')
-                                cancel_button4 = gr.Button("Cancel", visible=False)
+                                #cancel_button4 = gr.Button("Cancel", visible=False)
                                 forever4 = gr.Checkbox(label="generate forever", value=False, elem_id="forever4")
                             with gr.Row():
                                 video_to_extend = gr.Video(label="Video to extend")
@@ -616,7 +616,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                                 )
                             with gr.Row():
                                 enable_scale4 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                                enable_rife4 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
+                                enable_rife4 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False, visible=False)
 
                         with gr.Column():
                             video_output4 = gr.Video(label="Generated", width=720, height=480, interactive=False)
@@ -703,9 +703,10 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
         video_update = gr.update(visible=True, value=extended_video_path)
         gif_path = convert_to_gif(extended_video_path)
         gif_update = gr.update(visible=True, value=gif_path)
-        cancel_button_update = gr.update(visible=False)
+        #cancel_button_update = gr.update(visible=False)
 
-        return extended_video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update, cancel_button_update
+        #return extended_video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update, cancel_button_update
+        return extended_video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update
 
     def generate(
         prompt,
@@ -760,9 +761,10 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
         seed_update = gr.update(visible=True, value=seed)
         vid2vid_update = gr.update(visible=True)
         extendvid_update = gr.update(visible=True)
-        cancel_button_update = gr.update(visible=False)
+        #cancel_button_update = gr.update(visible=False)
 
-        return video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update, cancel_button_update
+        #return video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update, cancel_button_update
+        return video_path, video_update, gif_update, seed_update, vid2vid_update, extendvid_update
 
     def enhance_prompt_func(prompt):
         return convert_prompt(prompt, retry_times=1)
@@ -790,42 +792,51 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
         console.log('finished')
     }}
 }}"""
-    def show_cancel():
-        return gr.update(visible=True)
+
+#    def show_cancel():
+#        return gr.update(visible=True)
 
 
+#    g1 = generate_button.click(
+#        show_cancel, outputs=[cancel_button]
+#    ).then(
     g1 = generate_button.click(
-        show_cancel, outputs=[cancel_button]
-    ).then(
         generate,
         inputs=[prompt, image, video, strength, num_inference_steps, guidance_scale, model_choice, dtype_choice, seed_param, enable_scale, enable_rife, full_gpu],
-        outputs=[video_output, download_video_button, download_gif_button, seed_text, send_to_vid2vid_button, send_to_extendvid_button, cancel_button],
+        #outputs=[video_output, download_video_button, download_gif_button, seed_text, send_to_vid2vid_button, send_to_extendvid_button, cancel_button],
+        outputs=[video_output, download_video_button, download_gif_button, seed_text, send_to_vid2vid_button, send_to_extendvid_button, ],
     )
+#    g2 = generate_button2.click(
+#        show_cancel, outputs=[cancel_button2]
+#    ).then(
     g2 = generate_button2.click(
-        show_cancel, outputs=[cancel_button2]
-    ).then(
         generate,
         inputs=[prompt2, image2, video2, strength2, num_inference_steps2, guidance_scale2, model_choice2, dtype_choice2, seed_param2, enable_scale2, enable_rife2, full_gpu2],
-        outputs=[video_output2, download_video_button2, download_gif_button2, seed_text2, send_to_vid2vid_button2, send_to_extendvid_button2, cancel_button2],
+        #outputs=[video_output2, download_video_button2, download_gif_button2, seed_text2, send_to_vid2vid_button2, send_to_extendvid_button2, cancel_button2],
+        outputs=[video_output2, download_video_button2, download_gif_button2, seed_text2, send_to_vid2vid_button2, send_to_extendvid_button2, ],
     )
+#    g3 = generate_button3.click(
+#        show_cancel, outputs=[cancel_button3]
+#    ).then(
     g3 = generate_button3.click(
-        show_cancel, outputs=[cancel_button3]
-    ).then(
         generate,
         inputs=[prompt3, image3, video3, strength3, num_inference_steps3, guidance_scale3, model_choice3, dtype_choice3, seed_param3, enable_scale3, enable_rife3, full_gpu3],
-        outputs=[video_output3, download_video_button3, download_gif_button3, seed_text3, send_to_vid2vid_button3, send_to_extendvid_button3, cancel_button3],
+        #outputs=[video_output3, download_video_button3, download_gif_button3, seed_text3, send_to_vid2vid_button3, send_to_extendvid_button3, cancel_button3],
+        outputs=[video_output3, download_video_button3, download_gif_button3, seed_text3, send_to_vid2vid_button3, send_to_extendvid_button3, ],
     )
+#    g4 = generate_button4.click(
+#        show_cancel, outputs=[cancel_button4]
+#    ).then(
     g4 = generate_button4.click(
-        show_cancel, outputs=[cancel_button4]
-    ).then(
         extend,
         inputs=[prompt4, video_to_extend, extend_slider, extend_frame, video4, strength4, num_inference_steps4, guidance_scale4, model_choice4, dtype_choice4, seed_param4, enable_scale4, enable_rife4, full_gpu4],
-        outputs=[video_output4, download_video_button4, download_gif_button4, seed_text4, send_to_vid2vid_button4, send_to_extendvid_button4, cancel_button4],
+        #outputs=[video_output4, download_video_button4, download_gif_button4, seed_text4, send_to_vid2vid_button4, send_to_extendvid_button4, cancel_button4],
+        outputs=[video_output4, download_video_button4, download_gif_button4, seed_text4, send_to_vid2vid_button4, send_to_extendvid_button4, ],
     )
-    c1 = cancel_button.click(None, None, None, cancels=[g1])
-    c2 = cancel_button2.click(None, None, None, cancels=[g2])
-    c3 = cancel_button3.click(None, None, None, cancels=[g3])
-    c4 = cancel_button4.click(None, None, None, cancels=[g4])
+#    c1 = cancel_button.click(None, None, None, cancels=[g1])
+#    c2 = cancel_button2.click(None, None, None, cancels=[g2])
+#    c3 = cancel_button3.click(None, None, None, cancels=[g3])
+#    c4 = cancel_button4.click(None, None, None, cancels=[g4])
 
 
 
