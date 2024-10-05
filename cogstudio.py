@@ -444,7 +444,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                                 )
                             with gr.Row():
                                 enable_scale = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                                enable_rife = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False, visible=False)
+                                enable_rife = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
                             full_gpu = gr.Checkbox(label="Don't use CPU offload", info="If you have a lot of GPU VRAM, check this option for faster generation", value=False)
 
                         with gr.Column():
@@ -524,7 +524,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                                 )
                             with gr.Row():
                                 enable_scale2 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                                enable_rife2 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False, visible=False)
+                                enable_rife2 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
 
                         with gr.Column():
                             video_output2 = gr.Video(label="Generated", width=720, height=480, interactive=False)
@@ -568,7 +568,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                                 )
                             with gr.Row():
                                 enable_scale3 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                                enable_rife3 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False, visible=False)
+                                enable_rife3 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
 
                         with gr.Column():
                             video_output3 = gr.Video(label="Generated", width=720, height=480, interactive=False)
@@ -616,7 +616,7 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
                                 )
                             with gr.Row():
                                 enable_scale4 = gr.Checkbox(label="Super-Resolution (720 × 480 -> 2880 × 1920)", value=False)
-                                enable_rife4 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False, visible=False)
+                                enable_rife4 = gr.Checkbox(label="Frame Interpolation (8fps -> 16fps)", value=False)
 
                         with gr.Column():
                             video_output4 = gr.Video(label="Generated", width=720, height=480, interactive=False)
