@@ -127,3 +127,27 @@ python cogstudio.py
 ```
 
 That's all!
+
+
+# Using on Google Colab
+
+To run Cogstudio on Google Colab and allow external access, you can use the `--share` option. Follow these steps:
+
+1. Setup:
+
+```bash
+!git clone https://github.com/THUDM/CogVideo
+!git clone https://github.com/pinokiofactory/cogstudio.git
+!cp cogstudio/cogstudio.py CogVideo/inference/gradio_composite_demo
+%cd /content/CogVideo/inference/gradio_composite_demo
+!pip install -r requirements.txt
+!pip install moviepy==2.0.0.dev2
+```
+
+2. Run `cogstudio.py` with the `--share` option to generate a public link for external access:
+
+```bash
+!python cogstudio.py --share
+```
+
+This will provide a shareable Gradio link, allowing access to the application from outside Colab.
