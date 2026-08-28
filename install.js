@@ -33,8 +33,7 @@ module.exports = {
       params: {
         venv: "app/env",
         message: [
-          "uv pip install -r requirements.txt",
-          "uv pip install transformers==4.50.3 tiktoken protobuf"
+          "uv pip install -r requirements.txt"
         ]
       }
     },
