@@ -34,6 +34,7 @@ import utils
 from rife_model import load_rife_model, rife_inference_with_latents
 from huggingface_hub import hf_hub_download, snapshot_download
 import gc
+import argparse
 
 pipe = None
 pipe_image = None
@@ -873,4 +874,9 @@ with gr.Blocks(fill_width=True, fill_height=True, css=css) as demo:
     demo.load(refresh_generated_videos, outputs=reel)
 
 if __name__ == "__main__":
-    demo.launch()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--share", action="store_true", help="Share the app on Gradio")
+
+    args = parser.parse_args()
+
+    demo.launch(share=args.share)
